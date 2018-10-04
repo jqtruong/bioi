@@ -1,0 +1,821 @@
+#+STARTUP: hidestars
+
+* why start from the beginning with c?
+  why am i redoing the rosalind problems in c? it comes
+  after bash and lisp. i prefer learning the language than
+  getting shit done, maybe.
+
+* Logs
+
+** [2018-10-03 Wed]
+   c has =realloc= to grow a memory allocation. i would like
+   to see if i can hold a space in memory for all of the
+   strings, but, then again, maybe i can find a better way
+   to store FASTA strings. the end goal is to easily release
+   all that memory. using libs, i can add a destructor.
+
+   i would also like to run the problems like this:
+   : ./rosalind dna
+
+   and it will run the first problem with the same name.
+
+   char keycodes:
+   - A :: 65
+   - G :: 71
+   - C :: 67
+   - T :: 84
+
+* Refs
+  - [[https://renenyffenegger.ch/notes/development/languages/C-C-plus-plus/GCC/create-libraries/index][making a static lib]]
+  - [[https://gist.github.com/reecer/11065346][typical =Makefile=]]
+  - [[https://github.com/ReneNyffenegger/gcc-create-library][building static and shared libs]]
+  - [[https://chem.libretexts.org/Core/Biological_Chemistry/Nucleic_Acids/DNA/Transcription_of_DNA_Into_messenger_RNA#title][RNA]]
+  - [[https://math.stackexchange.com/questions/1477463/the-probability-of-at-least-18-successes-in-20-trials-binomial-distribution][Probability for At Least N]]
+
+* Problems
+
+** [[http://rosalind.info/problems/dna/][A Rapid Introduction to Molecular Biology]]
+   The cell, the building block of life, contains a nucleus
+   filled with chromatin. The Deoxyribose Nucleic Acids are
+   found in chromatin and are strands of similarly structured
+   molecules; in other words, they are polymers made of
+   monomers called nucleotides.
+
+   During mitosis, chromatin condenses into strings called
+   chromosomes, made of super-coils of nucleosomes and
+   proteins. Nucleosomes are made of the DNA in the
+   chromatin, coiled around proteins called histones. 
+
+   .o0(seems to me that they coil into compacted balls of an
+   incredible amount of data before splitting, leaving the
+   original and new cell with the same copy of the data. But
+   then how does a chromosome know to build - itself - in
+   such a way that it can be split equally? Or maybe that is
+   not what happens and both sides of a the symmetrical
+   chromosome contain different info? I'm pretty sure i'll
+   learn about that in the later chapters, even if i already
+   did and forgotten.)
+
+   A nucleotide consists of 3 parts:
+   - sugar, a monosaccharide called deoxyribose
+   - phosphate (some kind of salt)
+   - nucleobase compound
+     - Adenine
+     - Cytosine
+     - Guanine
+     - Thymine
+     - Uracil (to be discussed later in regards to RNA)
+
+   To form a chain of these nucleotides monomers into a
+   polymer, the sugar of one attaches to the phosphate of
+   another to for the backbone of a strand, and the bases
+   attract each other (with this rule: A ⇔ T, C ⇔ G) to form
+   the double helix DNA from two spiraling strands.
+
+   All living organisms on Earth have DNA, including
+   bacteria, but not all viruses.
+
+   .o0(viruses are considered non-living, but bacteria are
+   alive, so antibiotics can recognize them and kill them. is
+   that how it works? how does a virus infection "run its
+   course"? See [[*%5B%5Bhttps://en.wikipedia.org/wiki/Virus%5D%5BVirus%5D%5D][#Virus]].)
+
+** The Second Nucleic Acid
+   Along with the DNA molecule, the Ribose Nucleic Acid also
+   exists in the chromatin. RNA is very similar in structure
+   to DNA, except:
+   - the sugar is called ribose instead of deoxyribose
+   - the Uracil nucleobase replaces DNA's Thymine
+   - it's a single strand, 
+   - it can go outside of the nucleus
+
+   RNA is created from DNA via an enzyme called RNA
+   Polymerase during RNA Transcription. The 3'-5' strand of a
+   DNA is the template strand, the other is the coding
+   strand. At the end of the transcription, a pre-messenger
+   RNA will be the exact copy of the coding strand, except
+   the pre-mRNA will have the Uracil nucleobase instead of
+   Thymine. 
+
+   pre-mRNA becomes mRNA through RNA splicing, during which
+   introns are spliced out and only exons remain, although
+   some get spliced out too. The end result is a protein that
+   travels outside the nucleus to perform cell tasks.
+
+   .o0(when is it just an RNA?)
+
+** [[http://rosalind.info/problems/revc/][The Secondary and Tertiary Structures of DNA]]
+   This chapter re-iterates the double-helix shape of DNA
+   strands, which was proposed by James Watson and Francis
+   Crick in 1953.
+
+   The complementary bases (A ↔ T and C ↔ G) are also called
+   "base-pairs", or "bp" for short.
+
+** [[http://rosalind.info/problems/fib/][Wascally Wabbits]]
+   This chapter covers the Fibonacci series, a man also known
+   as Leonardo de Pisa, and how he solved a
+   somewhat-fictional problem of immortal rabbits reproducing
+   indefinitely, and that a pair of rabbits will attain a
+   count of 144 in a year.
+
+   .o0(it closely ties to cell reproduction, perhaps.)
+
+   Recurrence Relation is adding the next value of a sequence
+   based on the previous values.
+
+   Dynamic Programming is storing calculation for values into
+   a lookup table to be performed when needed, i.e. when
+   calculating a future value in a sequence via Recurrence
+   Relation; recursively calculate previous values.
+
+   .o0(in Lisp, that is similar to "[[http://kaygun.tumblr.com/post/98251739694/a-memoization-macro-for-common-lisp][memoization]]".)
+
+*** Sample
+    Find the number of pairs, starting with 1 pair, in 5
+    months, if a pair of rabbits give 3 offsprings each
+    month.
+
+    #+BEGIN_EXAMPLE
+      0 - a0
+      1 - A0
+      2 - A0 b0 b1 b2
+      3 - A0 c0 c1 c2 B0 B1 B2
+      4 - A0 d0 d1 d2 C0 C1 C2 B0 e0 e1 e2 B1 f0 f1 f2 B2 g0 g1 g2
+
+      Legend
+      ------
+      # :: months in
+      lower case letter :: new born pair
+      upper case letter :: grown up and ready to mate pair
+    #+END_EXAMPLE
+
+*** Compare standard recursion against memoize
+    Standard recursion:
+    #+BEGIN_EXAMPLE
+      (time (fib::rabbit-fib 40 5))
+      Evaluation took:
+        2.907 seconds of real time
+        2.907632 seconds of total run time (2.907632 user, 0.000000 system)
+        100.03% CPU
+        8,705,812,260 processor cycles
+        0 bytes consed
+  
+      148277527396903091
+    #+END_EXAMPLE
+
+    Memoized:
+    #+BEGIN_EXAMPLE
+      (time (fib::rabbit-fib 40 5))
+      Evaluation took:
+        0.000 seconds of real time
+        0.000056 seconds of total run time (0.000053 user, 0.000003 system)
+        100.00% CPU
+        162,210 processor cycles
+        0 bytes consed
+  
+      148277527396903091
+    #+END_EXAMPLE
+
+** [[http://rosalind.info/problems/gc/][Identifying Unknown DNA Quickly]]
+   Using frequency to determine origin of a long enough sample.
+  
+   Human genome has 3.2 billion base pairs, derived from an
+   average of a collection of individuals.
+
+   The Guanine-Cytosine base-pair content in a molecule is
+   used to determine origin of a molecule, e.g. type of
+   animal, plant, virus, etc. it came from. Although,
+   typically 50% in eukaryotic genomes, different species can
+   be distinguished by tiny discrepancies of that ratio,
+   e.g. prokaryotes (like bacteria) have a GC-content higher
+   than 50%.
+
+** [[http://rosalind.info/problems/hamm/][Evolution as a Sequence of Mistakes]]
+   Point mutations happen at the DNA level and can cause a
+   ripple effect since protein creation starts from genes
+   coded in the DNA. Mutations are not all bad though, else
+   there would (or might) not be evolution.
+
+   Comparing DNA from two species might reveal a common
+   ancestor.
+
+** [[http://rosalind.info/problems/iprb/][Introduction to Mendelian Inheritance]]
+   Gregor Mendel describes hereditiy, how a trait is passed
+   down from parent to child. A unit of heredity is called a
+   factor, a.k.a. a gene in regards to heredity, and has two
+   forms, called alleles. A trait variations are determined
+   by those alleles. A pair of chromosomes contain gene data
+   for a particular trait at a particular spot on both
+   strands, called the locus. If that pair of genes are
+   different, then those alleles are heterozygous, else
+   homozygous. If a parent has blue eyes, and the other has
+   brown eyes, and the child is born with blue eyes, then
+   that parent's allele in the child is dominant, and the
+   other is recessive. But, they say most traits are a result
+   of "the interaction of multiple genes", so non-Mendelian.
+  
+   .o0(some people have wet or dry earwax, and that's a
+   Mendelian trait!)
+
+*** Sample
+    Given a number for each of
+    the following organisms with alleles:
+    - =k= have dominant homozygous
+    - =m= heterozygous
+    - =n= recessive homozygous
+    and selecting two at random from any pool, calculate the
+    probability that their offspring would have a dominant
+    gene, from the =k= or =m= pools.
+
+    Given the following count, for a total of 6:
+    - k: 2
+    - m: 2
+    - n: 2
+
+    Note: Capital letters represents dominance, so we can
+    write it as such: KK Mm nn.
+
+    To produce an offspring with a dominant allele:
+
+
+    #+BEGIN_EXAMPLE
+      offspring
+      ⤷ k → k = 2/6 * 1/5 at 100%
+      ⤷ k → m = 2/6 * 2/5 at 100%
+      ⤷ k → n = 2/6 * 2/5 at 100%
+      ⤷ m → k = 2/6 * 2/5 at 100%
+      ⤷ m → m = 2/6 * 1/5 at  75%
+      ⤷ m → n = 2/6 * 2/5 at  50%
+      ⤷ n → k = 2/6 * 2/5 at 100%
+      ⤷ n → m = 2/6 * 2/5 at  50%
+      ⤷ n → n = 2/6 * 1/5 at   0%
+    #+END_EXAMPLE
+
+    The =k= pool: 100%
+    |   | K  | K  |
+    | K | KK | KK |
+    | K | KK | KK |
+
+    Mixing the =k= with the =m= pool: 100%
+    |   | K  | K  |
+    | M | KM | KM |
+    | m | Km | Km |
+
+    Mixing the =k= with the =n= pool: 100%
+    |   | K  | K  |
+    | n | Kn | Kn |
+    | n | Kn | Kn |
+
+    The =m= pool: 75%
+    |   | M  | m  |
+    | M | MM | Mm |
+    | m | Mm | mm |
+
+    Mixing the =m= with the =n= pool: 50%
+    |   | M  | m  |
+    | n | Mn | mn |
+    | n | Mn | nn |
+
+    The =n= pool: 0%
+    |   | n  | n  |
+    | n | nn | nn |
+    | n | nn | nn |
+
+** [[http://rosalind.info/problems/prot/][The Genetic Code]]
+   Protein chains are made of amino acids and are defined by
+   the order and combination of those.o0(so not made of all
+   the 20 amino acids.) Those chains are called polypeptides.
+   Some proteins are made of a single polypeptide while
+   others, like the hemoglobin which carry oxygen from the
+   lungs to the body's tissues, are made of smaller chains (4
+   polypeptide chains for the hemoglobin.)
+
+   Proteomics is field to study proteins and their
+   properties. As cells create proteins to create functions,
+   those 20 amino acids are somewhat key to figuring out how
+   life works, as opposed to what makes it life.
+
+   an mRNA translates into amino acids for protein creation,
+   so 4 nucleotides combines into (more than) 20 acids, in
+   groups of 3, somehow, called codons. 4^3 = 64 combinations,
+   so many codons produce the same amino acid.
+
+   There are two special codons:
+   1. AUG; amino acid methionine, start of translation
+   2. UAA, UAG, UGA; not an amino acid but signals end of
+      translation
+
+   Ribosome organelles use transfer-RNA to build peptides.
+   The tRNA has 3 RNA nucleotides, called the anticodon, on
+   one end to reverse-match with 3 mRNA nucleotides, i.e. a
+   codon, and attach to, whereas the other end is an amino
+   acid that's stripped and added to the peptide chain. The
+   rest of the tRNA, the middle section is ejected into the
+   cell?
+
+   The interval of (D|R)NA that translates into a protein is
+   called a gene. Genes also differentiate organisms, serve
+   as a basis for heredity.
+
+** [[http://rosalind.info/problems/subs/][Combing Through the Haystack]]
+   Similar intervals in DNA found in two different organisms
+   could mean a gene or protein that provides the same trait
+   or function; such intervals are called "motifs". Not to be
+   confused by repeats, which are similarly occurring
+   sequences of nucleotides but provide no known positive
+   purpose, like the Alu repeat which is tied to cause
+   genetic disorders.
+
+   .o0(more on [[https://en.wikipedia.org/wiki/Alu_element][Arthrobacter luteus]] and its negative effects,
+   including cancer, on humans, but it's 300 bp long and
+   kinda of big deal as it occupies 10.7% of the human
+   genome and can replicate to be inserted elsewhere on the
+   genome, as well as move about, a.k.a. retrotransposon.)
+
+** [[http://rosalind.info/problems/cons/][Finding a Most Likely Common Ancestor]]
+   Using a profile matrix, we can determine a consensus
+   string, which contains the most abundant nucleobases in
+   each column. I.e., given DNA strings (in matrix form):
+
+   | 1 | A | T | C | C | A | G | C | T |
+   | 2 | G | G | G | C | A | A | C | T |
+   | 3 | A | T | G | G | A | T | C | T |
+   | 4 | A | A | G | C | A | A | C | C |
+   | 5 | T | T | G | G | A | A | C | T |
+   | 6 | A | T | G | C | C | A | T | T |
+   | 7 | A | T | G | G | C | A | C | T |
+  
+   The profile matrix is:
+   | A | 5 | 1 | 0 | 0 | 5 | 5 | 0 | 0 |
+   | C | 0 | 0 | 1 | 4 | 2 | 0 | 6 | 1 |
+   | G | 1 | 1 | 6 | 3 | 0 | 1 | 0 | 0 |
+   | T | 1 | 5 | 0 | 0 | 0 | 1 | 1 | 6 |
+
+   And the consensus string results in:
+   |   | A | T | G | C | A | A | C | T |
+
+   This DNA string would be the most likely common ancestor
+   from the given 7 DNA strings.
+
+** [[http://rosalind.info/problems/fibd/][Wabbit Season]]
+   Revisiting the Fibonacci rate for rabbits reproduction but
+   introducing the mortality rate.
+
+   Originally, the formula was: F_n = F_(n-1) + F_(n-2), just
+   need to determine another to incorporate the death of a
+   pair of rabbits after a given number of months. Also,
+   pairs of rabbits strictly give one offspring per cycle.
+
+*** Sample
+    [[http://rosalind.info/media/problems/fibd/mortal_rabbit_tree.png][Figure 4]] shows an example clearly enough. In 6 cycles,
+    starting with a pair of rabbits that will give a single
+    offspring per cycle, and die in 3, results in 4 rabbits.
+
+    To see a pattern, let's expand on it:
+    |     | 1 |  2 |   3 |  4 | 5   | 6   | 7   | 8   | 9   | 10  |
+    |-----+---+----+-----+----+-----+-----+-----+-----+-----+-----|
+    | a   | - | -- | --- |    |     |     |     |     |     |     |
+    | b   |   |    |  2a | -- | --- |     |     |     |     |     |
+    | c   |   |    |     | 3a | --  | --- |     |     |     |     |
+    | d   |   |    |     |    | 4b  | --  | --- |     |     |     |
+    | e   |   |    |     |    |     | 5b  | --  | --- |     |     |
+    | f   |   |    |     |    |     | 5c  | --  | --- |     |     |
+    | g   |   |    |     |    |     |     | 6c  | --  | --- |     |
+    | h   |   |    |     |    |     |     | 6d  | --  | --- |     |
+    | i   |   |    |     |    |     |     |     | 7d  | --  | --- |
+    | j   |   |    |     |    |     |     |     | 7e  | --  | --- |
+    | k   |   |    |     |    |     |     |     | 7f  | --  | --- |
+    | l   |   |    |     |    |     |     |     |     | 8e  | --  |
+    | m   |   |    |     |    |     |     |     |     | 8f  | --  |
+    | n   |   |    |     |    |     |     |     |     | 8g  | --  |
+    | o   |   |    |     |    |     |     |     |     | 8h  | --  |
+    | p   |   |    |     |    |     |     |     |     |     | 9g  |
+    | q   |   |    |     |    |     |     |     |     |     | 9h  |
+    | r   |   |    |     |    |     |     |     |     |     | 9i  |
+    | s   |   |    |     |    |     |     |     |     |     | 9j  |
+    | t   |   |    |     |    |     |     |     |     |     | 9k  |
+    |-----+---+----+-----+----+-----+-----+-----+-----+-----+-----|
+    | tot | 1 |  1 |   2 |  2 | 3   | 4   | 5   | 7   | 9   | 12  |
+
+    The new pattern is: F_n = F_(n-2) + F_(n-3).
+
+    With a mortality rate of 4:
+    |     | 1 |  2 |   3 | 4    | 5   | 6    | 7    | 8    | 9    | 10   |
+    |-----+---+----+-----+------+-----+------+------+------+------+------|
+    | a   | - | -- | --- | ---- |     |      |      |      |      |      |
+    | b   |   |    |  2a | --   | --- | ---- |      |      |      |      |
+    | c   |   |    |     | 3a   | --  | ---  | ---- |      |      |      |
+    | d   |   |    |     |      | 4a  | --   | ---  | ---- |      |      |
+    | e   |   |    |     |      | 4b  | --   | ---  | ---- |      |      |
+    | f   |   |    |     |      |     | 5b   | --   | ---  | ---- |      |
+    | g   |   |    |     |      |     | 5c   | --   | ---  | ---- |      |
+    | h   |   |    |     |      |     |      | 6b   | --   | ---  | ---- |
+    | i   |   |    |     |      |     |      | 6c   | --   | ---  | ---- |
+    | j   |   |    |     |      |     |      | 6d   | --   | ---  | ---- |
+    | k   |   |    |     |      |     |      | 6e   | --   | ---  | ---- |
+    | l   |   |    |     |      |     |      |      | 7c   | --   | ---  |
+    | m   |   |    |     |      |     |      |      | 7d   | --   | ---  |
+    | n   |   |    |     |      |     |      |      | 7e   | --   | ---  |
+    | o   |   |    |     |      |     |      |      | 7f   | --   | ---  |
+    | p   |   |    |     |      |     |      |      | 7g   | --   | ---  |
+    | q   |   |    |     |      |     |      |      |      | 8d   | --   |
+    | r   |   |    |     |      |     |      |      |      | 8e   | --   |
+    | s   |   |    |     |      |     |      |      |      | 8f   | --   |
+    | t   |   |    |     |      |     |      |      |      | 8g   | --   |
+    | u   |   |    |     |      |     |      |      |      | 8h   | --   |
+    | v   |   |    |     |      |     |      |      |      | 8i   | --   |
+    | w   |   |    |     |      |     |      |      |      | 8j   | --   |
+    | x   |   |    |     |      |     |      |      |      | 8k   | --   |
+    |-----+---+----+-----+------+-----+------+------+------+------+------|
+    | tot | 1 |  1 |   2 | 3    | 4   | 6    | 9    | 13   | 19   |      |
+
+    This could be either: 
+    - F_n = F_(n-2) + F_(n-3) + F_(n-4)
+    - F_n = F_(n-1) + F_(n-3)
+    - F_n = F_(n-1) + F_(n-2) - 1
+
+    Incorporating the mortality rate, the first answer
+    matches a pattern of counting the number =n - m= ago, up
+    to =n - 2=, except for when =n ≤ m=, then it's just
+    F_(n - 1) + F_(n - 2).
+
+    E.g. at F_5 in the previous example, we get the one that
+    was born two cycles ago, 
+
+** [[http://rosalind.info/problems/grph/][A Brief Introduction to Graph Theory]]
+   .o0(nothing of biological learning value here; it just
+   explains graph theory.)
+
+** [[http://rosalind.info/problems/iev/][The Need for Averages]]
+   .o0(again, nothing of biological learning value here, just
+   the importance of predicting a possible future based on
+   averages of collected data.)
+
+** [[http://rosalind.info/problems/lcsm/][Searching Through the Haystack]]
+   .o0(bare minimal description to find the longest common
+   substring within DNA strands.)
+   
+   By far the hardest problem to solve since i started. i
+   have to use dynamic programming to find the long common
+   shared motif, and i'm running into a lot of trial and
+   error; all mostly good. I've cut down a lot of time,
+   first, by learning and applying dynamic programming, and
+   now looking into more ways to do so. One rule is to not
+   store luggage; only carry on, please. I used to keep
+   track of the matrix of matching suffixes, but it was only
+   necessary to know the last lengths from the previous
+   row. Now, i keep track of the shared motifs, but i wonder
+   if that's even necessary. For example, take a matching
+   substring from the first two strands, then see if it's
+   found in the rest, else throw it away. Another problem is
+   that with 4 nucleotides, very short common substrings are
+   plentiful and it should not be the end-goal to return
+   these; i.e. it seems more interesting to know the really
+   long ones. In that solution, i can still compare two
+   strands, then starting from the longest common shared
+   motif, check for it into each other strands. For 1k
+   bases, it takes almost 3 minutes to compare two strings,
+   and 196 GB!
+
+** [[http://rosalind.info/problems/lia/][Mendel's Second Law]]
+   Given two organisms with two traits, A and B, and the
+   alleles O_1(AA, Bb) and O_2(Aa, bb), then the Punnet
+   squares are as follows:
+   |   | A  | A  |   |   | B  | b  |
+   | A | AA | AA |   | b | Bb | bb |
+   | a | Aa | Aa |   | b | Bb | bb |
+
+   giving the probabilities for possible offspring alleles:
+   - AA: 1/2
+   - Aa: 1/2
+   - Bb: 1/2
+   - bb: 1/2
+
+   And the probability of the offspring to have any
+   combination of A and B by multiplication, and in this
+   (bad) example, pick any two: 1/2 * 1/2 = 1/4.
+
+*** Problem
+    Given: Two positive integers k (k ≤ 7) and N (N ≤ 2^k). In
+    this problem, we begin with Tom, who in the 0th
+    generation has genotype Aa Bb. Tom has two children in
+    the 1st generation, each of whom has two children, and so
+    on. Each organism always mates with an organism having
+    genotype Aa Bb.
+
+    Return: The probability that at least N Aa Bb organisms
+    will belong to the k-th generation of Tom's family tree
+    (don't count the Aa Bb mates at each level). Assume that
+    Mendel's second law holds for the factors.
+
+**** Sample
+     : k = 2, N = 1
+     The probability that the 2nd generation will have at
+     least 1 Aa Bb organism.
+
+     |   | A  | a  |   |   | B  | b  |
+     |---+----+----+---+---+----+----|
+     | A | AA | Aa |   | B | BB | Bb |
+     | a | Aa | aa |   | b | Bb | bb |
+
+***** F_1
+      |    | AB    | Ab    | aB    | ab    |
+      |----+-------+-------+-------+-------|
+      | AB | AA BB | AA Bb | Aa BB | Aa Bb |
+      | Ab | AA Bb | AA bb | Aa Bb | Aa bb |
+      | aB | Aa BB | Aa Bb | aa BB | aa Bb |
+      | ab | Aa Bb | Aa bb | aa Bb | aa bb |
+
+***** F_2
+      | Gametes   | AB    | Ab    | aB    | ab    |
+      | Genotypes |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | AA BB     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | AB        | AA BB | AA Bb | Aa BB | Aa Bb |
+      |-----------+-------+-------+-------+-------|
+      | AA Bb     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | AB        | AA BB | AA Bb | Aa BB | Aa Bb |
+      | Ab        | AA Bb | AA bb | Aa Bb | Aa bb |
+      |-----------+-------+-------+-------+-------|
+      | Aa BB     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | AB        | AA BB | AA Bb | Aa BB | Aa Bb |
+      | aB        | Aa BB | Aa Bb | aa BB | aa bb |
+      |-----------+-------+-------+-------+-------|
+      | AA bb     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | Ab        | AA Bb | AA bb | Aa Bb | Aa bb |
+      |-----------+-------+-------+-------+-------|
+      | Aa bb     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | Ab        | AA Bb | AA bb | Aa Bb | Aa bb |
+      | ab        | Aa Bb | Aa bb | aa Bb | aa bb |
+      |-----------+-------+-------+-------+-------|
+      | aa BB     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | aB        | Aa BB | Aa Bb | aa BB | aa Bb |
+      |-----------+-------+-------+-------+-------|
+      | aa Bb     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | aB        | Aa BB | Aa Bb | aa BB | aa Bb |
+      | ab        | Aa Bb | Aa bb | aa Bb | aa bb |
+      |-----------+-------+-------+-------+-------|
+      | aa bb     |       |       |       |       |
+      |-----------+-------+-------+-------+-------|
+      | ab        | Aa Bb | Aa bb | aa Bb | aa bb |
+
+**** Probability of "At Least Once"
+     Calculate the chances for such event of not happening
+     at all, giving Pr_nope, then the chance of such event
+     happening once is equal to: 1 - Pr_nope.
+
+     Pr_nope in our case is 3/4 (substract the count of =Aa
+     Bb= from the total number of combinations in the tables
+     above) to the 4^th (4 children) power, and the
+     probability of at least one AaBb is: 
+
+     Pr_AaBb = 1 - Pr_nope = 1 - 3/4^4 = 0.68359375
+
+     Now, is Pr_nope always 3/4 per child? It would seem so
+     because of the AaBb partner.
+
+**** Probability of "At Least N"
+     That would be 1 - Pr_nope + ... + Pr_n-_2 + Pr_n-_1. 
+
+     If k = 2, so with 4 children, 2^k, the probability that
+     only one is AaBb is when three children are born with
+     the probability Pr_notAaBb and that one child is born
+     with the probability Pr_AaBb:
+
+     - Pr_notAaBb: 3/4 children
+     - Pr_AaBb: 1/4 children
+
+     .o0(four children must be born, so it's not just 1/4)
+
+     Pr_1AaBb = 3/4 * 3/4 * 3/4 * 1/4 = 0.1055
+
+     So "At Least 2" means the probability of 2, 3, and 4
+     out of 4 children are AaBb, i.e. 1 minus the
+     probability that 0 or just 1 child are AaBb:
+
+     1 - Pr_nope - Pr_1AaBb = 1 - 0.3164 - 0.1055 = 0.5781
+
+     But, based on [[https://math.stackexchange.com/questions/1477463/the-probability-of-at-least-18-successes-in-20-trials-binomial-distribution][this]], we need to take the factorial of
+     the number of children multiplied by each
+     probabilities, divided by the factorials of successes
+     and failures.
+
+     1 - (4!⋅Pr_nope)/(0!4!) - (4!⋅Pr_1AaBb)/(1!3!) = 0.2617
+
+     why? [[Binomial Distribution][Binomial Distribution]].
+
+**** Binomial Distribution
+     First, let's dive into the Binomial Coefficient; given
+     a number of items, =n=, and a number of different items
+     in =n='s set, =k=:
+
+     (a b) = a!/b!(a - b)!
+
+     Since a factorial gives the number of permutations a
+     series of items can have, e.g. given 3 items a, b, and
+     c:
+
+     | 1 | a | b | c |
+     | 2 | a | c | b |
+     | 3 | b | a | c |
+     | 4 | b | c | a |
+     | 5 | c | a | b |
+
+     | 6 | c | b | a |
+
+     There are 3! permutations: 6. Now suppose that c = b,
+     change this series from 3 different items to 2, then
+     rows 1 and 2, 3 and 5, 4 and 6 are the same, giving
+     only 3 permutations. Using the formula above, we also
+     get the same result:
+
+     #+BEGIN_EXAMPLE
+     (3 2) = 3!/2!(3 - 2)!
+           = 6/2
+           = 3
+     #+END_EXAMPLE
+
+     For the Binomial Distribution, the denominator depends
+     on how many of each of the different items there are,
+     like a derivative. For the problem at hand, there are
+     2^k items, 2 different items (3/4 and 1/4, the
+     complement probabilities for Pr_1AaBb), so let's start
+     with the sample of k = 2 and N = 1. We still need to
+     know Pr_nope, which is 3/4^4, such that none of the 4
+     children in the second generation are AaBb, i.e. 0
+     children are AaBb, giving:
+
+     Pr_nope = (4! ÷ (4! × 0!)) × (3/4^4 × 1/4^0)
+
+     The 4!'s cancel out, 1/4^0 is just 1, leaving 3/4^4, and
+     giving for At Least 1 probability:
+
+     Pr_AL1 = 1 - Pr_nope = .684
+
+     Let's do N=2 now. We still need Pr_nope, and we also
+     need Pr_1, for exactly 1 child is AaBb, which is:
+
+     Pr_1 = (4! ÷ (3! × 1!)) × (3/4^3 × 1/4^1) = 0.422
+
+     Giving:
+
+     Pr_AL1 = 1 - Pr_nope - Pr_1 = 0.262
+
+** [[http://rosalind.info/problems/mprt/][Motif Implies Function]]
+   Proteins perform every practical function in the cell.
+
+   Protein domain is a recurring interval of amino acids
+   that can evolve and function independently.
+
+   Example functions of protein domains: 
+   - binding the protein to DNA,
+   - creating or breaking specific chemical bonds
+
+   Proteins can be part of multiple domains, and can be
+   artificially made to be so!
+
+   Proteins can evolve, forming families.
+
+   .o0(how does their evolution affect us?)
+
+   A domain determines function, and the component that
+   determines such function is called a motif, but unlike in
+   D/RNA strands, it is also referred to as a block,
+   signature, fingerprint, etc.
+
+   Protein motifs stay mostly the same across different
+   species, a.k.a. evolutionary conservative.
+
+   .o0(so a protein motif, or pattern, or whatever, can be
+   found in a different specie and perform the same
+   function.)
+
+   go to http://www.uniprot.org/ to view one of the central
+   repositories that gathers protein information.
+
+   #+BEGIN_QUOTE
+   The mission of UniProt is to provide the scientific
+   community with a comprehensive, high-quality and freely
+   accessible resource of protein sequence and functional
+   information.
+   #+END_QUOTE
+
+   N-glycosylation is the attachment of a oligosaccharide
+   (many simple sugars) to a nitrogen atom.
+   
+*** UniProt
+    Protein FASTA format in UniProt is [[https://en.wikipedia.org/wiki/FASTA_format#Sequence_identifiers][Swiss-Prot]], starting
+    with "sp".
+
+* Topics
+
+** RNA
+
+*** Transcription
+    .o0(seems that a coding strand is just named that way
+    instead of saying "going 5'->3' direction, and vice
+    versa for the template strand.)
+    
+    A RNA polymerase attaches to a promoter to start
+    creating a RNA strand from the genetic code that
+    follows.
+
+    RNA is different DNA in that the former is just a
+    section, a gene or protein recipe, taken from the DNA.
+
+*** Interference
+    .o0(how are there double strand RNA?)
+
+    RNA strands can be produced from each one of the DNA,
+    producing complementary ones, given they start and end at
+    the same respective points along the helix.
+
+*** Codon table
+    | Uracil |      | Cytosine |   | Adanine |           | Guanine |   |
+    |--------+------+----------+---+---------+-----------+---------+---|
+    | UUU    | F    | CUU      | L | AUU     | I         | GUU     | V |
+    | UUC    | F    | CUC      | L | AUC     | I         | GUC     | V |
+    | UUA    | L    | CUA      | L | AUA     | I         | GUA     | V |
+    | UUG    | L    | CUG      | L | AUG     | M (Start) | GUG     | V |
+    | UCU    | S    | CCU      | P | ACU     | T         | GCU     | A |
+    | UCC    | S    | CCC      | P | ACC     | T         | GCC     | A |
+    | UCA    | S    | CCA      | P | ACA     | T         | GCA     | A |
+    | UCG    | S    | CCG      | P | ACG     | T         | GCG     | A |
+    | UAU    | Y    | CAU      | H | AAU     | N         | GAU     | D |
+    | UAC    | Y    | CAC      | H | AAC     | N         | GAC     | D |
+    | UAA    | Stop | CAA      | Q | AAA     | K         | GAA     | E |
+    | UAG    | Stop | CAG      | Q | AAG     | K         | GAG     | E |
+    | UGU    | C    | CGU      | R | AGU     | S         | GGU     | G |
+    | UGC    | C    | CGC      | R | AGC     | S         | GGC     | G |
+    | UGA    | Stop | CGA      | R | AGA     | R         | GGA     | G |
+    | UGG    | W    | CGG      | R | AGG     | R         | GGG     | G |
+
+** [[https://en.wikipedia.org/wiki/Virus][Virus]]
+   - only replicates inside living cells
+   - consists of 2 or 3 things:
+     1. a genetic material: DNA, RNA, or molecules with
+        genetic information
+     2. a protein coat, called capsid, around the genetic
+        material
+     3. envelope of lipids over the coat when outside the
+        cell
+
+   Viruses could be considered life because of the genetic
+   material, reproduction, and evolution, but they don't
+   have a cell structure (like a nucleus?) to actually be
+   living.
+
+   The immune system will kill the virus infection. If the
+   body can not fight it on its own, vaccination is given to
+   teach it how to; the host's immune system recognizes the
+   threat in the vaccine, a weakened or dead virus, kills it
+   and learns how to do so later on.
+
+   .o0(if the body was not yet vaccinated, then i think
+   blood (like white cells) from a strong immune system is
+   transfused into the virus-infected host to help fight and
+   teach the host.)
+
+* Glossary
+  - 5' -> 3' :: (say 5 or 3 prime) direction of the coding
+                strand
+  - chromatin :: dense collection of nucleic acids (40%) and
+                 proteins found in the nucleus that's
+                 attracted to dye, hence the name.
+  - eukaryotic :: of the multicellular domain of life, yet
+                  including some unicellular ones, but seems
+                  like the cells contain a nucleus, a.k.a.
+                  the brain.
+  - exon :: protein-coding region in a gene
+  - FASTA format :: method to label DNA samples in a database
+  - genome :: sum total of DNA in an organism
+  - intron :: non-protein-coding region in a gene, most
+              commonly found in humans, and so much in
+              bacteria.
+  - mitosis :: the change involving a eukaryotic cell
+               division.
+  - nucleotide :: consists of 3 parts: sugar (deoxyribose),
+                  phosphate (some kind of salt), nucleobase
+                  compound (A, C, G, or T/U)
+  - phenotype :: the complete set of an organism's
+                 observable characteristics: morphological
+                 (appearance), developmental, biochemical
+                 and physiological properties, behavioral
+                 and products of given behavior.
+  - phosphate :: 1 of 3 parts that form the nucleic acid, or
+                 nucleotide; this one a negatively-charged
+                 ion, PO_4
+  - prokaryote :: unicellular bacterial organism
+  - promoter :: sequence of 100 to 1000 base pairs on the
+                DNA coding strand that the RNA polymerase
+                will attach to and start creating a copy of
+                it as an RNA strand.
+
