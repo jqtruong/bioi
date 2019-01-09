@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "strang.h"
 
 void
@@ -39,6 +36,17 @@ void
 strang_remove(char *buffer) {
   free(buffer);
   buffer = NULL;
+}
+
+void
+strang_rna_transcribe(char *dna_strand)
+{
+  char *nt = dna_strand;
+
+  while (*nt) {
+    if (*nt == 'T') *nt = 'U';
+    nt++;
+  }
 }
 
 void

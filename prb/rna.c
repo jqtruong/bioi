@@ -1,23 +1,18 @@
-#include <stdio.h>
+#include "../lib/strang.h"
 
 #define SAMPLE "GATGGAACTTGACTACGTAAATT"
-
-void
-rna_transcribe(char *dna_strand)
-{
-  
-}
 
 int
 main(int argc, char **argv)
 {
   char *strand = argc == 2 ? argv[1] : SAMPLE;
+  size_t size = strlen(strand);
+  char *rna_transcription = malloc(size);
 
-  while(*strand) {
-    if (*strand == 'T')
-    printf("%c\n", *strand);
-    strand++;
-  }
+  strncpy(rna_transcription, strand, size);
+  strang_rna_transcribe(rna_transcription);
+  printf("%s\n", rna_transcription);
+  free(rna_transcription);
 
   return 0;
 }
