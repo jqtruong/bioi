@@ -10,4 +10,5 @@ struct NTS {
 char *strang_store(const char *bases);
 void strang_count_acgt(struct NTS *nts, const char *strand);
 void strang_remove(char *buffer);
-void strang_rna_transcribe(char *dna_strand);
+void strang_reverse_complement(char *strand);
+void strang_rna_transcribe(char *strand);

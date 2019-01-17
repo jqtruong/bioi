@@ -3,7 +3,14 @@
 * why start from the beginning with c?
   why am i redoing the rosalind problems in c? it comes
   after bash and lisp. i prefer learning the language than
-  getting shit done, maybe.
+  getting shit done, maybe. but c is important to learn and
+  understand, unless one day we have an os written in
+  javascript or something (probably python, or lisp, most
+  likely.) it's fast and it's hard, and it's strenuous, but
+  i enjoy learning it more than others because they tend to
+  be specific for other things. there is also go,
+  apparently. maybe that should be my next attempt :D
+  lol... :( sigh.
 
 * Logs
 

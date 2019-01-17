@@ -39,9 +39,21 @@ strang_remove(char *buffer) {
 }
 
 void
-strang_rna_transcribe(char *dna_strand)
+strang_reverse_complement(char *strand)
 {
-  char *nt = dna_strand;
+  size_t len = strlen(strand);
+  /* char *reverse = malloc(len); */
+  /* char *complement = malloc(len); */
+
+  char *nt = strand + len - 1;
+
+  printf("last %c\n", *nt);
+}
+
+void
+strang_rna_transcribe(char *strand)
+{
+  char *nt = strand;
 
   while (*nt) {
     if (*nt == 'T') *nt = 'U';
